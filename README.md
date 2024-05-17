@@ -16,3 +16,7 @@ This is a simple password generator web application built with React and Vite.
 - TypeScript: A typed superset of JavaScript that compiles to plain JavaScript.
 - Tailwind CSS: A utility-first CSS framework for rapid UI development.
 
+## Deployed Link
+
+- **Check out the live website at https://create-strongpassword-generator-react.netlify.app/**
+
