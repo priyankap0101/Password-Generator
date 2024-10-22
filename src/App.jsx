@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import Header from "./component/Header";
-import { FiEye, FiEyeOff } from "react-icons/fi"; // Icons for password visibility toggle
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 function App() {
   const [length, setLength] = useState(8);
@@ -8,12 +8,14 @@ function App() {
   const [characterAllowed, setCharAllowed] = useState(false);
   const [uppercaseAllowed, setUppercaseAllowed] = useState(false);
   const [excludeSimilar, setExcludeSimilar] = useState(false);
+  const [customInput, setCustomInput] = useState(""); // Custom input state
+  const [useCustomInput, setUseCustomInput] = useState(false); // Toggle for using custom input
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordHistory, setPasswordHistory] = useState([]);
   const [timeRemaining, setTimeRemaining] = useState(30);
   const [copied, setCopied] = useState(false);
-  const [darkMode, setDarkMode] = useState(false); // Dark mode state
+  const [darkMode, setDarkMode] = useState(false);
   const passwordRef = useRef(null);
 
   // Custom hook for password generation logic
@@ -28,24 +30,36 @@ function App() {
 
       if (excludeSimilar) str = str.replace(/[O0Il1]/g, ""); // Exclude similar characters
 
+      // Generate the main part of the password
       for (let i = 1; i <= length; i++) {
         let char = Math.floor(Math.random() * str.length);
         pass += str.charAt(char);
       }
+
+      // Add custom input if it's enabled and not empty
+      if (useCustomInput && customInput) {
+        // Insert custom input at a random position
+        const insertAt = Math.floor(Math.random() * pass.length);
+        pass = pass.slice(0, insertAt) + customInput + pass.slice(insertAt);
+      }
+
       return pass;
-    }, [length, numberAllowed, characterAllowed, uppercaseAllowed, excludeSimilar]);
+    }, [length, numberAllowed, characterAllowed, uppercaseAllowed, excludeSimilar, customInput, useCustomInput]);
   };
 
   const passwordGenerator = usePasswordGenerator();
 
-  const calculateStrength = useCallback((pass) => {
-    let strength = "Weak";
-    if (pass.length >= 12) strength = "Moderate";
-    if (pass.length >= 16 && numberAllowed && characterAllowed && uppercaseAllowed) {
-      strength = "Strong";
-    }
-    return strength;
-  }, [numberAllowed, characterAllowed, uppercaseAllowed]);
+  const calculateStrength = useCallback(
+    (pass) => {
+      let strength = "Weak";
+      if (pass.length >= 12) strength = "Moderate";
+      if (pass.length >= 16 && numberAllowed && characterAllowed && uppercaseAllowed) {
+        strength = "Strong";
+      }
+      return strength;
+    },
+    [numberAllowed, characterAllowed, uppercaseAllowed]
+  );
 
   const copyPasswordToClipboard = useCallback(() => {
     passwordRef.current?.select();
@@ -77,28 +91,28 @@ function App() {
   };
 
   return (
-    <div className={`min-h-screen ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"}`}>
+    <div className={`min-h-screen ${darkMode ? "bg-gray-800 text-gray-200" : "bg-gray-100 text-gray-800"}`}>
       <Header />
-      <div className="w-full max-w-md px-6 py-4 mx-auto my-8 rounded-lg shadow-lg">
+      <div className="w-full max-w-md px-6 py-4 mx-auto my-8 bg-white rounded-lg shadow-lg dark:bg-gray-900">
         <h1 className="mb-4 text-2xl font-bold text-center">Password Generator</h1>
 
-        <div className="flex items-center mb-4 rounded-lg shadow">
+        <div className="flex items-center mb-4 space-x-2 rounded-lg shadow">
           <input
             type={showPassword ? "text" : "password"}
             value={password}
             ref={passwordRef}
-            className="w-full px-3 py-2 text-lg text-gray-800 outline-none bg-gray-50"
+            className="w-full px-3 py-2 text-lg text-gray-800 rounded-l-lg outline-none bg-gray-50 dark:bg-gray-700 dark:text-gray-200"
             readOnly
           />
           <button
             onClick={copyPasswordToClipboard}
-            className="px-4 py-2 text-white transition-colors bg-blue-600 hover:bg-blue-500"
+            className="px-4 py-2 text-white transition-colors bg-blue-600 rounded-r-lg hover:bg-blue-500"
           >
             Copy
           </button>
           <button
             onClick={() => setShowPassword(!showPassword)}
-            className="px-4 py-2 text-white transition-colors bg-gray-600 hover:bg-gray-500"
+            className="px-4 py-2 text-white transition-colors bg-gray-600 rounded-lg hover:bg-gray-500"
           >
             {showPassword ? <FiEyeOff /> : <FiEye />}
           </button>
@@ -118,7 +132,7 @@ function App() {
             max={100}
             value={length}
             onChange={(e) => setLength(e.target.value)}
-            className="w-full cursor-pointer"
+            className="w-full bg-gray-300 rounded-lg cursor-pointer"
           />
         </div>
 
@@ -126,7 +140,7 @@ function App() {
           <label className="mr-4">Strength: {calculateStrength(password)}</label>
           <div className="relative w-full h-2 bg-gray-300 rounded-full">
             <div
-              className={`absolute h-full rounded-full transition-all duration-300 ${
+              className={`absolute h-full rounded-full transition-all duration-500 ${
                 calculateStrength(password) === "Strong"
                   ? "bg-green-500 w-full"
                   : calculateStrength(password) === "Moderate"
@@ -137,7 +151,7 @@ function App() {
           </div>
         </div>
 
-        <div className="mb-4 text-center text-gray-500">
+        <div className="mb-4 text-center text-gray-500 dark:text-gray-400">
           Password expires in: {timeRemaining}s
           {timeRemaining < 10 && (
             <span className="ml-2 text-red-500">Hurry!</span>
@@ -150,7 +164,7 @@ function App() {
               type="checkbox"
               checked={numberAllowed}
               onChange={() => setNumberAllowed(!numberAllowed)}
-              className="mr-2 cursor-pointer"
+              className="mr-2 rounded cursor-pointer focus:ring-2 focus:ring-blue-400"
             />
             Include Numbers
           </label>
@@ -159,7 +173,7 @@ function App() {
               type="checkbox"
               checked={characterAllowed}
               onChange={() => setCharAllowed(!characterAllowed)}
-              className="mr-2 cursor-pointer"
+              className="mr-2 rounded cursor-pointer focus:ring-2 focus:ring-blue-400"
             />
             Include Characters
           </label>
@@ -168,7 +182,7 @@ function App() {
               type="checkbox"
               checked={uppercaseAllowed}
               onChange={() => setUppercaseAllowed(!uppercaseAllowed)}
-              className="mr-2 cursor-pointer"
+              className="mr-2 rounded cursor-pointer focus:ring-2 focus:ring-blue-400"
             />
             Include Uppercase
           </label>
@@ -177,31 +191,39 @@ function App() {
               type="checkbox"
               checked={excludeSimilar}
               onChange={() => setExcludeSimilar(!excludeSimilar)}
-              className="mr-2 cursor-pointer"
+              className="mr-2 rounded cursor-pointer focus:ring-2 focus:ring-blue-400"
             />
             Exclude Similar Characters
           </label>
         </div>
 
+        {/* Custom Input Section */}
         <div className="my-4">
-          <h2 className="mb-2">Password History</h2>
-          <ul className="text-sm">
-            {passwordHistory.map((pwd, index) => (
-              <li key={index} className="mb-1">
-                {pwd}
-              </li>
-            ))}
-          </ul>
+          <label className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              checked={useCustomInput}
+              onChange={() => setUseCustomInput(!useCustomInput)}
+              className="mr-2 cursor-pointer"
+            />
+            Include Custom Input (e.g., Name)
+          </label>
+          <input
+            type="text"
+            value={customInput}
+            onChange={(e) => setCustomInput(e.target.value)}
+            disabled={!useCustomInput}
+            placeholder="Enter custom text"
+            className="w-full px-4 py-2 text-gray-800 bg-gray-100 rounded-lg outline-none dark:bg-gray-700 dark:text-gray-300"
+          />
         </div>
 
-        <div className="flex justify-end mt-4">
-          <button
-            onClick={toggleDarkMode}
-            className="px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-500 rounded-md hover:bg-blue-400"
-          >
-            Toggle Dark Mode
-          </button>
-        </div>
+        <button
+          onClick={toggleDarkMode}
+          className="px-4 py-2 mt-4 text-white transition-colors bg-gray-800 rounded-lg hover:bg-gray-700"
+        >
+          Toggle {darkMode ? "Light" : "Dark"} Mode
+        </button>
       </div>
     </div>
   );
