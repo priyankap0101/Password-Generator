@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { FiEye, FiEyeOff, FiCopy, FiInfo } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiCopy } from "react-icons/fi";
 import { Switch } from "@headlessui/react";
 
 function App() {
@@ -18,54 +18,50 @@ function App() {
   const [customInputPosition, setCustomInputPosition] = useState("start");
   const passwordRef = useRef(null);
 
-  const usePasswordGenerator = () => {
-    return useCallback(() => {
-      let pass = "";
-      let str = "abcdefghijklmnopqrstuvwxyz"; // Lowercase letters
+  // Password generation hook with dependencies
+  const usePasswordGenerator = useCallback(() => {
+    let pass = "";
+    let str = "abcdefghijklmnopqrstuvwxyz";
 
-      if (uppercaseAllowed) str += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      if (numberAllowed) str += "0123456789";
-      if (characterAllowed) str += "!@#$%^&*()+={}~`";
+    if (uppercaseAllowed) str += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    if (numberAllowed) str += "0123456789";
+    if (characterAllowed) str += "!@#$%^&*()+={}~`";
+    if (excludeSimilar) str = str.replace(/[O0Il1]/g, "");
 
-      if (excludeSimilar) str = str.replace(/[O0Il1]/g, ""); // Exclude similar characters
+    for (let i = 0; i < length; i++) {
+      let char = Math.floor(Math.random() * str.length);
+      pass += str.charAt(char);
+    }
 
-      // Generate base password without custom input
-      for (let i = 0; i < length; i++) {
-        let char = Math.floor(Math.random() * str.length);
-        pass += str.charAt(char);
+    // Custom input insertion
+    if (customInput.length > 0) {
+      if (customInputPosition === "start") {
+        pass = customInput + pass.slice(customInput.length);
+      } else if (customInputPosition === "end") {
+        pass = pass.slice(0, length - customInput.length) + customInput;
+      } else if (customInputPosition === "random") {
+        const randomIndex = Math.floor(
+          Math.random() * (length - customInput.length)
+        );
+        pass =
+          pass.slice(0, randomIndex) +
+          customInput +
+          pass.slice(randomIndex + customInput.length);
       }
+    }
 
-      if (customInput.length > 0) {
-        // Insert the custom input at the desired position
-        if (customInputPosition === "start") {
-          pass = customInput + pass.slice(customInput.length);
-        } else if (customInputPosition === "end") {
-          pass = pass.slice(0, length - customInput.length) + customInput;
-        } else if (customInputPosition === "random") {
-          const randomIndex = Math.floor(
-            Math.random() * (length - customInput.length)
-          );
-          pass =
-            pass.slice(0, randomIndex) +
-            customInput +
-            pass.slice(randomIndex + customInput.length);
-        }
-      }
+    return pass;
+  }, [
+    length,
+    numberAllowed,
+    characterAllowed,
+    uppercaseAllowed,
+    excludeSimilar,
+    customInput,
+    customInputPosition,
+  ]);
 
-      return pass;
-    }, [
-      length,
-      numberAllowed,
-      characterAllowed,
-      uppercaseAllowed,
-      excludeSimilar,
-      customInput,
-      customInputPosition,
-    ]);
-  };
-
-  const passwordGenerator = usePasswordGenerator();
-
+  // Calculate strength of the generated password
   const calculateStrength = useCallback(
     (pass) => {
       let strength = "Weak";
@@ -83,6 +79,7 @@ function App() {
     [numberAllowed, characterAllowed, uppercaseAllowed]
   );
 
+  // Clipboard copy functionality
   const copyPasswordToClipboard = useCallback(() => {
     passwordRef.current?.select();
     passwordRef.current?.setSelectionRange(0, 99999);
@@ -91,8 +88,9 @@ function App() {
     setTimeout(() => setCopied(false), 2000);
   }, [password]);
 
+  // Generate password on changes
   useEffect(() => {
-    const newPassword = passwordGenerator();
+    const newPassword = usePasswordGenerator();
     setPassword(newPassword);
     setPasswordHistory((prevHistory) => [
       newPassword,
@@ -105,9 +103,10 @@ function App() {
     characterAllowed,
     uppercaseAllowed,
     excludeSimilar,
-    passwordGenerator,
+    usePasswordGenerator,
   ]);
 
+  // Countdown timer for password reset
   useEffect(() => {
     if (timeRemaining > 0) {
       const timer = setInterval(
@@ -116,25 +115,24 @@ function App() {
       );
       return () => clearInterval(timer);
     } else {
-      setPassword(passwordGenerator());
+      setPassword(usePasswordGenerator());
       setTimeRemaining(30);
     }
-  }, [timeRemaining, passwordGenerator]);
+  }, [timeRemaining, usePasswordGenerator]);
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
+  // Toggle dark mode
+  const toggleDarkMode = () => setDarkMode(!darkMode);
 
   return (
     <div
       className={`min-h-screen flex flex-col ${
-        darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+        darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
       } transition-all`}
     >
       {/* Header Section */}
-      <header className="py-4 text-white bg-blue-600 shadow-md">
-        <div className="container flex items-center justify-between mx-auto">
-          <h1 className="text-3xl font-bold">Password Generator</h1>
+      <header className="py-4 bg-blue-600 shadow-md">
+        <div className="container flex items-center justify-between mx-auto max-w-7xl">
+          <h1 className="text-3xl font-bold text-white">Password Generator</h1>
           <nav className="space-x-4">
             <a href="#features" className="transition-all hover:text-gray-200">
               Features
@@ -149,15 +147,11 @@ function App() {
         </div>
       </header>
 
-      {/* Main Content Section */}
-      <main className="container flex-grow p-8 mx-auto">
-        <section className="max-w-3xl p-10 mx-auto transition-transform duration-500 ease-in-out transform bg-white shadow-lg dark:bg-gray-800 rounded-2xl hover:scale-105">
-          <h2 className="mb-6 text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
-            Generate Strong Passwords
-          </h2>
-
+      {/* Main Content */}
+      <main className="container flex-grow p-8 mx-auto max-w-7xl">
+        <section className="p-10 transition-transform duration-500 ease-in-out bg-white shadow-lg dark:bg-gray-800 rounded-2xl">
           {/* Password Field */}
-          <div className="relative mb-8 group">
+          <div className="relative mb-8">
             <label className="block mb-2 text-lg font-medium">
               Generated Password:
             </label>
@@ -166,19 +160,19 @@ function App() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 ref={passwordRef}
-                className="w-full p-3 text-lg transition-all bg-gray-100 border border-gray-300 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:bg-gray-50 dark:focus:bg-gray-600"
                 readOnly
+                className="w-full p-3 text-lg bg-gray-100 border border-gray-300 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-400"
               />
               <button
                 onClick={copyPasswordToClipboard}
-                className="absolute p-2 text-gray-600 transition-colors right-12 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                className="absolute p-2 text-gray-600 right-12 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                 title="Copy Password"
               >
                 <FiCopy size={20} />
               </button>
               <button
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute p-2 text-gray-600 transition-colors right-4 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                className="absolute p-2 text-gray-600 right-4 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                 title={showPassword ? "Hide Password" : "Show Password"}
               >
                 {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
@@ -201,48 +195,44 @@ function App() {
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               placeholder="Add custom text to password"
-              className="w-full p-3 text-lg transition-all bg-gray-100 border border-gray-300 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:bg-gray-50 dark:focus:bg-gray-600"
+              className="w-full p-3 text-lg bg-gray-100 border border-gray-300 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-400"
             />
           </div>
 
-          {/* Options */}
+          {/* Options Section */}
           <div className="grid grid-cols-2 gap-4 mb-8">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={numberAllowed}
-                onChange={() => setNumberAllowed(!numberAllowed)}
-                className="mr-2"
-              />
-              Include Numbers
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={characterAllowed}
-                onChange={() => setCharAllowed(!characterAllowed)}
-                className="mr-2"
-              />
-              Include Special Characters
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={uppercaseAllowed}
-                onChange={() => setUppercaseAllowed(!uppercaseAllowed)}
-                className="mr-2"
-              />
-              Include Uppercase Letters
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={excludeSimilar}
-                onChange={() => setExcludeSimilar(!excludeSimilar)}
-                className="mr-2"
-              />
-              Exclude Similar Characters
-            </label>
+            {[
+              {
+                label: "Include Numbers",
+                checked: numberAllowed,
+                onChange: () => setNumberAllowed(!numberAllowed),
+              },
+              {
+                label: "Include Special Characters",
+                checked: characterAllowed,
+                onChange: () => setCharAllowed(!characterAllowed),
+              },
+              {
+                label: "Include Uppercase Letters",
+                checked: uppercaseAllowed,
+                onChange: () => setUppercaseAllowed(!uppercaseAllowed),
+              },
+              {
+                label: "Exclude Similar Characters",
+                checked: excludeSimilar,
+                onChange: () => setExcludeSimilar(!excludeSimilar),
+              },
+            ].map((opt) => (
+              <label className="flex items-center" key={opt.label}>
+                <input
+                  type="checkbox"
+                  checked={opt.checked}
+                  onChange={opt.onChange}
+                  className="mr-2"
+                />
+                {opt.label}
+              </label>
+            ))}
           </div>
 
           {/* Password Length */}
@@ -260,45 +250,41 @@ function App() {
             />
           </div>
 
-          {/* Password Strength Bar */}
-          <div className="h-2 mb-2 overflow-hidden bg-gray-300 rounded-full dark:bg-gray-700">
-            <div
-              className={`h-full transition-all ${
-                calculateStrength(password) === "Strong"
-                  ? "bg-green-500 w-full"
-                  : calculateStrength(password) === "Moderate"
-                  ? "bg-yellow-500 w-3/4"
-                  : "bg-red-500 w-1/4"
-              }`}
-            />
+          {/* Strength Indicator */}
+          <div className="mb-8">
+            <label className="block text-lg font-medium">Strength:</label>
+            <p className="text-xl font-semibold">
+              {calculateStrength(password)}
+            </p>
           </div>
-          <p className="mt-2 text-sm">{calculateStrength(password)}</p>
 
           {/* Dark Mode Toggle */}
-          <div className="flex items-center justify-between mb-8">
-            <label className="text-lg">Dark Mode:</label>
-            <Switch
-              checked={darkMode}
-              onChange={toggleDarkMode}
-              className={`${
-                darkMode ? "bg-blue-600" : "bg-gray-300"
-              } relative inline-flex h-6 w-11 items-center rounded-full transition-all`}
-            >
-              <span
+          <div className="flex items-center justify-end">
+            <Switch.Group>
+              <Switch.Label className="mr-4 font-medium text-gray-900 dark:text-gray-100">
+                Dark Mode
+              </Switch.Label>
+              <Switch
+                checked={darkMode}
+                onChange={toggleDarkMode}
                 className={`${
-                  darkMode ? "translate-x-6" : "translate-x-1"
-                } inline-block h-4 w-4 transform rounded-full bg-white transition-all`}
-              />
-            </Switch>
+                  darkMode ? "bg-blue-600" : "bg-gray-200"
+                } relative inline-flex items-center h-6 rounded-full w-11`}
+              >
+                <span
+                  className={`${
+                    darkMode ? "translate-x-6" : "translate-x-1"
+                  } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 ease-in-out`}
+                />
+              </Switch>
+            </Switch.Group>
           </div>
         </section>
       </main>
 
-      {/* Footer Section */}
-      <footer className="py-4 mt-8 text-white bg-gray-800">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2024 Password Generator. All rights reserved.</p>
-        </div>
+      {/* Footer */}
+      <footer className="py-4 text-sm text-center text-white bg-blue-600">
+        © 2024 Made With ❤️ By Your Company
       </footer>
     </div>
   );
