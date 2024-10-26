@@ -18,7 +18,7 @@ function App() {
   const [customInputPosition, setCustomInputPosition] = useState("start");
   const passwordRef = useRef(null);
 
-  // Password generation hook with dependencies
+  // Password generation hook
   const usePasswordGenerator = useCallback(() => {
     let pass = "";
     let str = "abcdefghijklmnopqrstuvwxyz";
@@ -35,19 +35,16 @@ function App() {
 
     // Custom input insertion
     if (customInput.length > 0) {
-      if (customInputPosition === "start") {
-        pass = customInput + pass.slice(customInput.length);
-      } else if (customInputPosition === "end") {
-        pass = pass.slice(0, length - customInput.length) + customInput;
-      } else if (customInputPosition === "random") {
-        const randomIndex = Math.floor(
-          Math.random() * (length - customInput.length)
-        );
-        pass =
-          pass.slice(0, randomIndex) +
-          customInput +
-          pass.slice(randomIndex + customInput.length);
-      }
+      const insertionIndex = {
+        start: 0,
+        end: pass.length,
+        random: Math.floor(Math.random() * (length - customInput.length)),
+      }[customInputPosition];
+
+      pass =
+        pass.slice(0, insertionIndex) +
+        customInput +
+        pass.slice(insertionIndex);
     }
 
     return pass;
@@ -61,20 +58,20 @@ function App() {
     customInputPosition,
   ]);
 
-  // Calculate strength of the generated password
+  // Calculate password strength
   const calculateStrength = useCallback(
     (pass) => {
-      let strength = "Weak";
-      if (pass.length >= 12) strength = "Moderate";
       if (
         pass.length >= 16 &&
         numberAllowed &&
         characterAllowed &&
         uppercaseAllowed
       ) {
-        strength = "Strong";
+        return "Strong";
+      } else if (pass.length >= 12) {
+        return "Moderate";
       }
-      return strength;
+      return "Weak";
     },
     [numberAllowed, characterAllowed, uppercaseAllowed]
   );
@@ -82,13 +79,12 @@ function App() {
   // Clipboard copy functionality
   const copyPasswordToClipboard = useCallback(() => {
     passwordRef.current?.select();
-    passwordRef.current?.setSelectionRange(0, 99999);
     window.navigator.clipboard.writeText(password);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, [password]);
 
-  // Generate password on changes
+  // Generate password on options change
   useEffect(() => {
     const newPassword = usePasswordGenerator();
     setPassword(newPassword);
@@ -110,18 +106,26 @@ function App() {
   useEffect(() => {
     if (timeRemaining > 0) {
       const timer = setInterval(
-        () => setTimeRemaining(timeRemaining - 1),
+        () => setTimeRemaining((prev) => prev - 1),
         1000
       );
       return () => clearInterval(timer);
     } else {
-      setPassword(usePasswordGenerator());
+      const newPassword = usePasswordGenerator();
+      setPassword(newPassword);
       setTimeRemaining(30);
     }
   }, [timeRemaining, usePasswordGenerator]);
 
   // Toggle dark mode
   const toggleDarkMode = () => setDarkMode(!darkMode);
+
+  // Function to handle using a password from the history
+  const handleUsePassword = (pass) => {
+    setPassword(pass); // Update the current password state
+    // Optionally, show a notification or highlight the input
+    alert(`Password "${pass}" has been selected!`); // Feedback (optional)
+  };
 
   return (
     <div
@@ -133,68 +137,18 @@ function App() {
       <header className="py-4 bg-blue-600 shadow-md">
         <div className="container flex items-center justify-between mx-auto max-w-7xl">
           <h1 className="text-3xl font-bold text-white">Password Generator</h1>
-          <nav className="hidden space-x-4 md:flex">
-            <a href="#features" className="transition-all hover:text-gray-200">
-              Features
-            </a>
-            <a href="#about" className="transition-all hover:text-gray-200">
-              About
-            </a>
-            <a href="#contact" className="transition-all hover:text-gray-200">
-              Contact
-            </a>
-          </nav>
-          <div className="md:hidden">
-            <button
-              id="menu-toggle"
-              className="text-white focus:outline-none"
-              aria-label="Toggle Menu"
-            >
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-        {/* Mobile Navigation */}
-        <div id="mobile-menu" className="md:hidden">
-          <nav className="flex flex-col items-center py-4 space-y-2 bg-blue-600">
-            <a
-              href="#features"
-              className="text-white transition-all hover:text-gray-200"
-            >
-              Features
-            </a>
-            <a
-              href="#about"
-              className="text-white transition-all hover:text-gray-200"
-            >
-              About
-            </a>
-            <a
-              href="#contact"
-              className="text-white transition-all hover:text-gray-200"
-            >
-              Contact
-            </a>
-          </nav>
+          <button
+            onClick={toggleDarkMode}
+            className="text-white focus:outline-none"
+          >
+            {darkMode ? "Light Mode" : "Dark Mode"}
+          </button>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="container flex-grow p-8 mx-auto max-w-7xl">
-        <section className="p-10 transition-transform duration-500 ease-in-out bg-white shadow-lg dark:bg-gray-800 rounded-2xl">
+        <section className="p-10 bg-white shadow-lg dark:bg-gray-800 rounded-2xl">
           {/* Password Field */}
           <div className="relative mb-8">
             <label className="block mb-2 text-lg font-medium">
@@ -224,7 +178,7 @@ function App() {
               </button>
             </div>
             {copied && (
-              <p className="mt-2 text-sm text-green-600 animate-pulse">
+              <p className="mt-2 text-sm text-green-600">
                 Password copied to clipboard!
               </p>
             )}
@@ -249,7 +203,7 @@ function App() {
               <select
                 value={customInputPosition}
                 onChange={(e) => setCustomInputPosition(e.target.value)}
-                className="w-full p-3 text-lg bg-gray-100 border border-gray-300 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-400"
+                className="p-3 text-lg bg-gray-100 border border-gray-300 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600"
               >
                 <option value="start">Start</option>
                 <option value="end">End</option>
@@ -257,92 +211,149 @@ function App() {
               </select>
             </div>
           </div>
-          {/* Options */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="uppercaseAllowed"
-                checked={uppercaseAllowed}
-                onChange={(e) => setUppercaseAllowed(e.target.checked)}
-                className="w-6 h-6 text-blue-600 transition-all border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
-              />
-              <label htmlFor="uppercaseAllowed" className="ml-2">
-                Allow Uppercase
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="numberAllowed"
-                checked={numberAllowed}
-                onChange={(e) => setNumberAllowed(e.target.checked)}
-                className="w-6 h-6 text-blue-600 transition-all border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
-              />
-              <label htmlFor="numberAllowed" className="ml-2">
-                Allow Numbers
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="characterAllowed"
-                checked={characterAllowed}
-                onChange={(e) => setCharAllowed(e.target.checked)}
-                className="w-6 h-6 text-blue-600 transition-all border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
-              />
-              <label htmlFor="characterAllowed" className="ml-2">
-                Allow Special Characters
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="excludeSimilar"
-                checked={excludeSimilar}
-                onChange={(e) => setExcludeSimilar(e.target.checked)}
-                className="w-6 h-6 text-blue-600 transition-all border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
-              />
-              <label htmlFor="excludeSimilar" className="ml-2">
-                Exclude Similar Characters
-              </label>
-            </div>
-            <div className="flex items-center">
-              <label htmlFor="passwordLength" className="mr-4">
-                Length:
-              </label>
-              <input
-                type="range"
-                min="4"
-                max="32"
-                value={length}
-                onChange={(e) => setLength(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer dark:bg-gray-700"
-              />
-              <span className="ml-4">{length}</span>
-            </div>
-          </div>
-        </section>
 
-        {/* Password History */}
-        <section className="mt-8">
-          <h2 className="mb-4 text-2xl font-semibold">Password History</h2>
-          <ul className="space-y-2">
-            {passwordHistory.map((pass, index) => (
-              <li
-                key={index}
-                className="p-3 bg-gray-100 rounded-lg dark:bg-gray-700"
+          {/* Options */}
+          <div className="mb-8 space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-lg font-medium">Password Length:</label>
+              <input
+                type="number"
+                value={length}
+                onChange={(e) =>
+                  setLength(Math.min(Math.max(4, e.target.value), 20))
+                } // Ensure length is within bounds
+                min="4"
+                max="20"
+                className="w-20 p-2 text-lg text-center bg-gray-100 border border-gray-300 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600"
+              />
+            </div>
+            <Switch
+              checked={numberAllowed}
+              onChange={setNumberAllowed}
+              className={`flex items-center p-2 rounded-lg ${
+                numberAllowed ? "bg-blue-600" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`mr-2 text-lg font-medium ${
+                  numberAllowed ? "text-white" : "text-gray-800"
+                }`}
               >
-                {pass}
-              </li>
-            ))}
-          </ul>
+                Include Numbers
+              </span>
+              <span
+                className={`w-8 h-8 rounded-full ${
+                  numberAllowed ? "bg-white" : "bg-gray-500"
+                }`}
+              />
+            </Switch>
+            <Switch
+              checked={uppercaseAllowed}
+              onChange={setUppercaseAllowed}
+              className={`flex items-center p-2 rounded-lg ${
+                uppercaseAllowed ? "bg-blue-600" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`mr-2 text-lg font-medium ${
+                  uppercaseAllowed ? "text-white" : "text-gray-800"
+                }`}
+              >
+                Include Uppercase
+              </span>
+              <span
+                className={`w-8 h-8 rounded-full ${
+                  uppercaseAllowed ? "bg-white" : "bg-gray-500"
+                }`}
+              />
+            </Switch>
+            <Switch
+              checked={characterAllowed}
+              onChange={setCharAllowed}
+              className={`flex items-center p-2 rounded-lg ${
+                characterAllowed ? "bg-blue-600" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`mr-2 text-lg font-medium ${
+                  characterAllowed ? "text-white" : "text-gray-800"
+                }`}
+              >
+                Include Special Characters
+              </span>
+              <span
+                className={`w-8 h-8 rounded-full ${
+                  characterAllowed ? "bg-white" : "bg-gray-500"
+                }`}
+              />
+            </Switch>
+            <Switch
+              checked={excludeSimilar}
+              onChange={setExcludeSimilar}
+              className={`flex items-center p-2 rounded-lg ${
+                excludeSimilar ? "bg-blue-600" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`mr-2 text-lg font-medium ${
+                  excludeSimilar ? "text-white" : "text-gray-800"
+                }`}
+              >
+                Exclude Similar Characters
+              </span>
+              <span
+                className={`w-8 h-8 rounded-full ${
+                  excludeSimilar ? "bg-white" : "bg-gray-500"
+                }`}
+              />
+            </Switch>
+          </div>
+
+          {/* Password Strength Indicator */}
+          <div className="mb-4">
+            <span className="block mb-1 text-lg font-medium">
+              Password Strength:
+            </span>
+            <div
+              className={`h-2 rounded-lg ${
+                calculateStrength(password) === "Strong"
+                  ? "bg-green-500"
+                  : calculateStrength(password) === "Moderate"
+                  ? "bg-yellow-500"
+                  : "bg-red-500"
+              }`}
+              style={{ width: `${(password.length / 20) * 100}%` }}
+            />
+          </div>
+
+          {/* Password History */}
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold">Password History:</h2>
+            <ul className="mt-2 space-y-1">
+              {passwordHistory.map((pass, index) => (
+                <li
+                  key={index}
+                  className="flex justify-between p-2 bg-gray-100 rounded-lg dark:bg-gray-700"
+                >
+                  <span>{pass}</span>
+                  <button
+                    onClick={() => handleUsePassword(pass)}
+                    className="text-blue-500 hover:underline"
+                  >
+                    Use
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center text-white bg-gray-900">
-        <p className="text-sm">© 2024 Made With By Pixinvent</p>
+      <footer className="py-4 text-center bg-gray-200 dark:bg-gray-800">
+        <p className="text-gray-600 dark:text-gray-400">
+          &copy; 2024 Password Generator
+        </p>
       </footer>
     </div>
   );
