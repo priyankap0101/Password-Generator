@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { FiEye, FiEyeOff, FiCopy } from "react-icons/fi";
 import { Switch } from "@headlessui/react";
+import Header from "./component/Header";
 
 function App() {
   const [length, setLength] = useState(8);
@@ -134,24 +135,14 @@ function App() {
       } transition-all`}
     >
       {/* Header Section */}
-      <header className="py-4 bg-blue-600 shadow-md">
-        <div className="container flex items-center justify-between mx-auto max-w-7xl">
-          <h1 className="text-3xl font-bold text-white">Password Generator</h1>
-          <button
-            onClick={toggleDarkMode}
-            className="text-white focus:outline-none"
-          >
-            {darkMode ? "Light Mode" : "Dark Mode"}
-          </button>
-        </div>
-      </header>
+     <Header/>
 
       {/* Main Content */}
-      <main className="container flex-grow max-w-5xl p-6 mx-auto">
+      <main className="container flex-grow max-w-4xl p-6 mx-auto mt-10">
         <section className="p-8 bg-white shadow-lg dark:bg-gray-800 rounded-xl">
           {/* Password Field */}
-          <div className="relative mb-6">
-            <label className="block mb-1 font-semibold text-md">
+          <div className="relative ">
+            <label className="block mb-2 text-lg font-semibold">
               Generated Password:
             </label>
             <div className="flex items-center">
@@ -160,7 +151,7 @@ function App() {
                 value={password}
                 ref={passwordRef}
                 readOnly
-                className="w-full p-2 bg-gray-100 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-400"
+                className="w-full px-3 py-2 transition bg-gray-100 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
               />
               <button
                 onClick={copyPasswordToClipboard}
@@ -178,15 +169,15 @@ function App() {
               </button>
             </div>
             {copied && (
-              <p className="mt-1 text-sm text-green-600">
+              <p className="mt-2 text-sm text-green-500">
                 Copied to clipboard!
               </p>
             )}
           </div>
 
           {/* Custom Input */}
-          <div className="mb-6">
-            <label className="block mb-1 font-semibold text-md">
+          <div className="mb-8">
+            <label className="block mb-2 text-lg font-semibold">
               Custom Text (optional):
             </label>
             <input
@@ -194,15 +185,15 @@ function App() {
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               placeholder="Add custom text"
-              className="w-full p-2 bg-gray-100 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-400"
+              className="w-full px-3 py-2 mb-4 transition bg-gray-100 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
             />
-            <label className="block mt-4 font-semibold text-md">
+            <label className="block mt-4 text-lg font-semibold">
               Position:
             </label>
             <select
               value={customInputPosition}
               onChange={(e) => setCustomInputPosition(e.target.value)}
-              className="p-2 mt-1 bg-gray-100 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              className="w-full px-3 py-2 mt-2 transition bg-gray-100 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
             >
               <option value="start">Start</option>
               <option value="end">End</option>
@@ -211,7 +202,7 @@ function App() {
           </div>
 
           {/* Options */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6 mb-8">
             {[
               {
                 label: "Include Numbers",
@@ -235,20 +226,20 @@ function App() {
               },
             ].map((option, idx) => (
               <div key={idx} className="flex items-center">
-                <label className="mr-2 font-semibold text-md">
+                <label className="mr-2 text-lg font-semibold">
                   {option.label}
                 </label>
                 <Switch
                   checked={option.value}
                   onChange={option.setValue}
-                  className={`flex items-center rounded-full ${
+                  className={`relative inline-flex items-center h-6 rounded-full w-12 transition ${
                     option.value ? "bg-blue-600" : "bg-gray-300"
                   }`}
                 >
                   <span
-                    className={`h-4 w-8 rounded-full transition-all ${
-                      option.value ? "translate-x-6 bg-white" : "bg-gray-500"
-                    }`}
+                    className={`${
+                      option.value ? "translate-x-6" : "translate-x-1"
+                    } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
                   />
                 </Switch>
               </div>
@@ -256,28 +247,30 @@ function App() {
           </div>
 
           {/* Password Strength */}
-          <div className="mb-4">
-            <span className="font-semibold text-md">Strength:</span>
+          <div className="mb-8">
+            <span className="text-lg font-semibold">Strength:</span>
             <div
-              className={`h-2 mt-1 rounded-lg ${
+              className={`h-2 mt-2 rounded-lg transition-all ${
                 calculateStrength(password) === "Strong"
                   ? "bg-green-500"
                   : calculateStrength(password) === "Moderate"
                   ? "bg-yellow-500"
                   : "bg-red-500"
               }`}
-              style={{ width: `${(password.length / 20) * 100}%` }}
+              style={{
+                width: `${Math.min((password.length / 20) * 100, 100)}%`,
+              }}
             />
           </div>
 
           {/* Password History */}
-          <div className="mt-6">
-            <h2 className="font-semibold text-md">History:</h2>
-            <ul className="mt-2 space-y-1">
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold">History:</h2>
+            <ul className="mt-4 space-y-2">
               {passwordHistory.map((pass, index) => (
                 <li
                   key={index}
-                  className="flex justify-between p-2 bg-gray-100 rounded-lg dark:bg-gray-700"
+                  className="flex justify-between px-3 py-2 bg-gray-100 rounded-lg dark:bg-gray-700"
                 >
                   <span>{pass}</span>
                   <button
