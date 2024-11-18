@@ -4,6 +4,7 @@ import { Switch } from "@headlessui/react";
 import Header from "./component/Header";
 
 function App() {
+  // State variables
   const [length, setLength] = useState(8);
   const [numberAllowed, setNumberAllowed] = useState(false);
   const [characterAllowed, setCharAllowed] = useState(false);
@@ -30,12 +31,12 @@ function App() {
     if (excludeSimilar) str = str.replace(/[O0Il1]/g, "");
 
     for (let i = 0; i < length; i++) {
-      let char = Math.floor(Math.random() * str.length);
+      const char = Math.floor(Math.random() * str.length);
       pass += str.charAt(char);
     }
 
-    // Custom input insertion
-    if (customInput.length > 0) {
+    // Insert custom input if provided
+    if (customInput) {
       const insertionIndex = {
         start: 0,
         end: pass.length,
@@ -77,7 +78,7 @@ function App() {
     [numberAllowed, characterAllowed, uppercaseAllowed]
   );
 
-  // Clipboard copy functionality
+  // Copy password to clipboard
   const copyPasswordToClipboard = useCallback(() => {
     passwordRef.current?.select();
     window.navigator.clipboard.writeText(password);
@@ -85,14 +86,11 @@ function App() {
     setTimeout(() => setCopied(false), 2000);
   }, [password]);
 
-  // Generate password on options change
+  // Generate password on state change
   useEffect(() => {
     const newPassword = usePasswordGenerator();
     setPassword(newPassword);
-    setPasswordHistory((prevHistory) => [
-      newPassword,
-      ...prevHistory.slice(0, 4),
-    ]);
+    setPasswordHistory((prev) => [newPassword, ...prev.slice(0, 4)]);
     setTimeRemaining(30);
   }, [
     length,
@@ -121,27 +119,29 @@ function App() {
   // Toggle dark mode
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
-  // Function to handle using a password from the history
+  // Handle password history usage
   const handleUsePassword = (pass) => {
-    setPassword(pass); // Update the current password state
-    // Optionally, show a notification or highlight the input
-    alert(`Password "${pass}" has been selected!`); // Feedback (optional)
+    setPassword(pass);
+    alert(`Password "${pass}" has been selected!`);
   };
 
-  return (
-    <div
-      className={`min-h-screen flex flex-col ${
-        darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
-      } transition-all`}
-    >
-      {/* Header Section */}
-     <Header/>
+  // Define color styles based on dark mode
+  const bgColor = darkMode ? "bg-gray-900" : "bg-white";
+  const textColor = darkMode ? "text-white" : "text-gray-900";
+  const borderColor = darkMode ? "border-gray-600" : "border-gray-300";
+  const inputBgColor = darkMode ? "bg-gray-700" : "bg-gray-100";
+  const buttonBgColor = darkMode ? "bg-gray-800" : "bg-gray-200";
+  const buttonHoverColor = darkMode ? "bg-gray-700" : "bg-gray-300";
+  const passwordInputTextColor = darkMode ? "text-gray-300" : "text-gray-600";
+  const switchBgColor = darkMode ? "bg-blue-600" : "bg-gray-300";
 
-      {/* Main Content */}
+  return (
+    <div className={`min-h-screen flex flex-col ${bgColor} ${textColor} transition-all`}>
+      <Header />
+
       <main className="container flex-grow max-w-4xl p-6 mx-auto mt-10">
-        <section className="p-8 bg-white shadow-lg dark:bg-gray-800 rounded-xl">
-          {/* Password Field */}
-          <div className="relative ">
+        <section className={`p-8 shadow-lg rounded-xl ${bgColor} ${textColor}`}>
+          <div className="relative">
             <label className="block mb-2 text-lg font-semibold">
               Generated Password:
             </label>
@@ -151,18 +151,18 @@ function App() {
                 value={password}
                 ref={passwordRef}
                 readOnly
-                className="w-full px-3 py-2 transition bg-gray-100 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 transition ${inputBgColor} ${borderColor} rounded-lg focus:ring-2 focus:ring-blue-500`}
               />
               <button
                 onClick={copyPasswordToClipboard}
-                className="absolute p-2 text-gray-600 right-12 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                className={`absolute p-2 right-12 ${passwordInputTextColor} hover:text-white`}
                 title="Copy"
               >
                 <FiCopy size={18} />
               </button>
               <button
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute p-2 text-gray-600 right-4 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                className={`absolute p-2 right-4 ${passwordInputTextColor} hover:text-white`}
                 title={showPassword ? "Hide" : "Show"}
               >
                 {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
@@ -185,15 +185,13 @@ function App() {
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               placeholder="Add custom text"
-              className="w-full px-3 py-2 mb-4 transition bg-gray-100 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 mb-4 transition ${inputBgColor} ${borderColor} rounded-lg focus:ring-2 focus:ring-blue-500`}
             />
-            <label className="block mt-4 text-lg font-semibold">
-              Position:
-            </label>
+            <label className="block mt-4 text-lg font-semibold">Position:</label>
             <select
               value={customInputPosition}
               onChange={(e) => setCustomInputPosition(e.target.value)}
-              className="w-full px-3 py-2 mt-2 transition bg-gray-100 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 mt-2 transition ${inputBgColor} ${borderColor} rounded-lg focus:ring-2 focus:ring-blue-500`}
             >
               <option value="start">Start</option>
               <option value="end">End</option>
@@ -232,9 +230,7 @@ function App() {
                 <Switch
                   checked={option.value}
                   onChange={option.setValue}
-                  className={`relative inline-flex items-center h-6 rounded-full w-12 transition ${
-                    option.value ? "bg-blue-600" : "bg-gray-300"
-                  }`}
+                  className={`relative inline-flex items-center h-6 rounded-full w-12 transition ${option.value ? switchBgColor : "bg-gray-300"}`}
                 >
                   <span
                     className={`${
@@ -248,34 +244,33 @@ function App() {
 
           {/* Password Strength */}
           <div className="mb-8">
-            <span className="text-lg font-semibold">Strength:</span>
-            <div
-              className={`h-2 mt-2 rounded-lg transition-all ${
+            <span className="text-lg font-semibold">Password Strength: </span>
+            <span
+              className={`text-lg font-bold ${
                 calculateStrength(password) === "Strong"
-                  ? "bg-green-500"
+                  ? "text-green-500"
                   : calculateStrength(password) === "Moderate"
-                  ? "bg-yellow-500"
-                  : "bg-red-500"
+                  ? "text-yellow-500"
+                  : "text-red-500"
               }`}
-              style={{
-                width: `${Math.min((password.length / 20) * 100, 100)}%`,
-              }}
-            />
+            >
+              {calculateStrength(password)}
+            </span>
           </div>
 
           {/* Password History */}
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold">History:</h2>
-            <ul className="mt-4 space-y-2">
-              {passwordHistory.map((pass, index) => (
+          <div className="mb-6">
+            <h2 className="mb-4 text-lg font-semibold">Password History:</h2>
+            <ul className="space-y-2">
+              {passwordHistory.map((pass, idx) => (
                 <li
-                  key={index}
-                  className="flex justify-between px-3 py-2 bg-gray-100 rounded-lg dark:bg-gray-700"
+                  key={idx}
+                  className={`flex items-center justify-between p-2 rounded-lg transition ${inputBgColor} ${textColor}`}
                 >
-                  <span>{pass}</span>
+                  <span className="truncate">{pass}</span>
                   <button
                     onClick={() => handleUsePassword(pass)}
-                    className="text-blue-500 hover:underline"
+                    className={`px-2 py-1 text-sm rounded-lg transition ${buttonBgColor} ${textColor} hover:${buttonHoverColor}`}
                   >
                     Use
                   </button>
@@ -287,10 +282,13 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center bg-gray-200 dark:bg-gray-800">
-        <p className="text-gray-600 dark:text-gray-400">
-          &copy; 2024 Password Generator
-        </p>
+      <footer className="py-6 text-center">
+        <button
+          onClick={toggleDarkMode}
+          className={`px-4 py-2 text-sm font-medium transition rounded-lg ${buttonBgColor} ${textColor} hover:${buttonHoverColor}`}
+        >
+          {darkMode ? "Light Mode" : "Dark Mode"}
+        </button>
       </footer>
     </div>
   );
