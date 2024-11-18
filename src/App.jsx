@@ -199,6 +199,22 @@ function App() {
             </select>
           </div>
 
+          
+<div className="mb-8">
+  <label className="block mb-2 text-lg font-semibold">
+    Password Length: {length}
+  </label>
+  <input
+    type="range"
+    min="4"
+    max="32"
+    value={length}
+    onChange={(e) => setLength(parseInt(e.target.value))}
+    className="w-full"
+  />
+</div>
+
+
           {/* Options */}
           <div className="grid grid-cols-2 gap-6 mb-8">
             {[
