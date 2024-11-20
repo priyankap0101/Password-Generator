@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { FiEye, FiEyeOff, FiCopy } from "react-icons/fi";
 import { Switch } from "@headlessui/react";
 import Header from "./component/Header";
+import QRCodeGenerator from "./component/QRCodeGenerator";
 
 function App() {
   // State variables
@@ -135,26 +136,6 @@ function App() {
   const passwordInputTextColor = darkMode ? "text-gray-300" : "text-gray-600";
   const switchBgColor = darkMode ? "bg-blue-600" : "bg-gray-300";
 
-  // Reusable password option component
-  const PasswordOption = ({ label, checked, onChange }) => (
-    <div className="flex items-center">
-      <label className="mr-2 text-lg font-semibold">{label}</label>
-      <Switch
-        checked={checked}
-        onChange={onChange}
-        className={`relative inline-flex items-center h-6 rounded-full w-12 transition ${
-          checked ? switchBgColor : "bg-gray-300"
-        }`}
-      >
-        <span
-          className={`${
-            checked ? "translate-x-6" : "translate-x-1"
-          } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
-        />
-      </Switch>
-    </div>
-  );
-
   return (
     <div
       className={`min-h-screen flex flex-col ${bgColor} ${textColor} transition-all`}
@@ -191,7 +172,9 @@ function App() {
               </button>
             </div>
             {copied && (
-              <p className="mt-2 text-sm text-green-500">Copied to clipboard!</p>
+              <p className="mt-2 text-sm text-green-500">
+                Copied to clipboard!
+              </p>
             )}
           </div>
 
@@ -207,7 +190,9 @@ function App() {
               placeholder="Add custom text"
               className={`w-full px-3 py-2 mb-4 transition ${inputBgColor} ${borderColor} rounded-lg focus:ring-2 focus:ring-blue-500`}
             />
-            <label className="block mt-4 text-lg font-semibold">Position:</label>
+            <label className="block mt-4 text-lg font-semibold">
+              Position:
+            </label>
             <select
               value={customInputPosition}
               onChange={(e) => setCustomInputPosition(e.target.value)}
@@ -219,43 +204,94 @@ function App() {
             </select>
           </div>
 
-          {/* Password Options */}
           <div className="mb-8">
-            <PasswordOption
-              label="Include Numbers"
-              checked={numberAllowed}
-              onChange={() => setNumberAllowed(!numberAllowed)}
-            />
-            <PasswordOption
-              label="Include Uppercase Letters"
-              checked={uppercaseAllowed}
-              onChange={() => setUppercaseAllowed(!uppercaseAllowed)}
-            />
-            <PasswordOption
-              label="Include Special Characters"
-              checked={characterAllowed}
-              onChange={() => setCharAllowed(!characterAllowed)}
-            />
-            <PasswordOption
-              label="Exclude Similar Characters (0, O, I, l)"
-              checked={excludeSimilar}
-              onChange={() => setExcludeSimilar(!excludeSimilar)}
+            <label className="block mb-2 text-lg font-semibold">
+              Password Length: {length}
+            </label>
+            <input
+              type="range"
+              min="4"
+              max="32"
+              value={length}
+              onChange={(e) => setLength(parseInt(e.target.value))}
+              className="w-full"
             />
           </div>
 
-          {/* Password History */}
-          <div className="mb-8">
-            <h3 className="mb-4 text-xl font-semibold">Password History:</h3>
-            <ul>
-              {passwordHistory.map((pass, index) => (
-                <li
-                  key={index}
-                  className="flex items-center justify-between mb-2 text-sm"
+          {/* Options */}
+          <div className="grid grid-cols-2 gap-6 mb-8">
+            {[
+              {
+                label: "Include Numbers",
+                value: numberAllowed,
+                setValue: setNumberAllowed,
+              },
+              {
+                label: "Include Uppercase",
+                value: uppercaseAllowed,
+                setValue: setUppercaseAllowed,
+              },
+              {
+                label: "Include Special Characters",
+                value: characterAllowed,
+                setValue: setCharAllowed,
+              },
+              {
+                label: "Exclude Similar Characters",
+                value: excludeSimilar,
+                setValue: setExcludeSimilar,
+              },
+            ].map((option, idx) => (
+              <div key={idx} className="flex items-center">
+                <label className="mr-2 text-lg font-semibold">
+                  {option.label}
+                </label>
+                <Switch
+                  checked={option.value}
+                  onChange={option.setValue}
+                  className={`relative inline-flex items-center h-6 rounded-full w-12 transition ${
+                    option.value ? switchBgColor : "bg-gray-300"
+                  }`}
                 >
-                  <span>{pass}</span>
+                  <span
+                    className={`${
+                      option.value ? "translate-x-6" : "translate-x-1"
+                    } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+                  />
+                </Switch>
+              </div>
+            ))}
+          </div>
+
+          {/* Password Strength */}
+          <div className="mb-8">
+            <span className="text-lg font-semibold">Password Strength: </span>
+            <span
+              className={`text-lg font-bold ${
+                calculateStrength(password) === "Strong"
+                  ? "text-green-500"
+                  : calculateStrength(password) === "Moderate"
+                  ? "text-yellow-500"
+                  : "text-red-500"
+              }`}
+            >
+              {calculateStrength(password)}
+            </span>
+          </div>
+
+          {/* Password History */}
+          <div className="mb-6">
+            <h2 className="mb-4 text-lg font-semibold">Password History:</h2>
+            <ul className="space-y-2">
+              {passwordHistory.map((pass, idx) => (
+                <li
+                  key={idx}
+                  className={`flex items-center justify-between p-2 rounded-lg transition ${inputBgColor} ${textColor}`}
+                >
+                  <span className="truncate">{pass}</span>
                   <button
                     onClick={() => handleUsePassword(pass)}
-                    className="px-2 py-1 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                    className={`px-2 py-1 text-sm rounded-lg transition ${buttonBgColor} ${textColor} hover:${buttonHoverColor}`}
                   >
                     Use
                   </button>
@@ -263,8 +299,20 @@ function App() {
               ))}
             </ul>
           </div>
+
+          <QRCodeGenerator password={password} darkMode={darkMode} />
         </section>
       </main>
+
+      {/* Footer */}
+      <footer className="py-6 text-center">
+        <button
+          onClick={toggleDarkMode}
+          className={`px-4 py-2 text-sm font-medium transition rounded-lg ${buttonBgColor} ${textColor} hover:${buttonHoverColor}`}
+        >
+          {darkMode ? "Light Mode" : "Dark Mode"}
+        </button>
+      </footer>
     </div>
   );
 }
