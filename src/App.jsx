@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { FiEye, FiEyeOff, FiCopy } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiCopy, FiMoon, FiSun } from "react-icons/fi";
 import { Switch } from "@headlessui/react";
 import Header from "./component/Header";
 import QRCodeGenerator from "./component/QRCodeGenerator";
@@ -140,10 +140,23 @@ function App() {
     <div
       className={`min-h-screen flex flex-col ${bgColor} ${textColor} transition-all`}
     >
-      <Header />
+      {/* <Header /> */}
 
       <main className="container flex-grow max-w-4xl p-6 mx-auto mt-10">
         <section className={`p-8 shadow-lg rounded-xl ${bgColor} ${textColor}`}>
+          {/* Form Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-semibold">Password Generator</h1>
+            <button
+              onClick={toggleDarkMode}
+              className={`flex items-center px-4 py-2 text-sm font-medium transition rounded-lg ${buttonBgColor} ${textColor} hover:${buttonHoverColor}`}
+            >
+              {darkMode ? <FiSun size={18} /> : <FiMoon size={18} />}
+              <span className="ml-2">
+                {darkMode ? "Light Mode" : "Dark Mode"}
+              </span>
+            </button>
+          </div>
           <div className="relative">
             <label className="block mb-2 text-lg font-semibold">
               Generated Password:
@@ -303,16 +316,6 @@ function App() {
           <QRCodeGenerator password={password} darkMode={darkMode} />
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className="py-6 text-center">
-        <button
-          onClick={toggleDarkMode}
-          className={`px-4 py-2 text-sm font-medium transition rounded-lg ${buttonBgColor} ${textColor} hover:${buttonHoverColor}`}
-        >
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
-      </footer>
     </div>
   );
 }
