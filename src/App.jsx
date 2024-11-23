@@ -142,21 +142,28 @@ function App() {
     >
       {/* <Header /> */}
 
-      <main className="container flex-grow max-w-4xl p-6 mx-auto mt-10">
+      <main className="container flex-grow max-w-4xl p-6 mx-auto ">
         <section className={`p-8 shadow-lg rounded-xl ${bgColor} ${textColor}`}>
           {/* Form Header */}
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-semibold">Password Generator</h1>
-            <button
-              onClick={toggleDarkMode}
-              className={`flex items-center px-4 py-2 text-sm font-medium transition rounded-lg ${buttonBgColor} ${textColor} hover:${buttonHoverColor}`}
+            <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-sm">
+              Password Generator
+            </h1>
+            <Switch
+              checked={darkMode}
+              onChange={toggleDarkMode}
+              className={`relative inline-flex items-center h-6 w-12 rounded-full ${
+                darkMode ? "bg-blue-600" : "bg-gray-400"
+              }`}
             >
-              {darkMode ? <FiSun size={18} /> : <FiMoon size={18} />}
-              <span className="ml-2">
-                {darkMode ? "Light Mode" : "Dark Mode"}
-              </span>
-            </button>
+              <span
+                className={`${
+                  darkMode ? "translate-x-6" : "translate-x-1"
+                } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+              />
+            </Switch>
           </div>
+
           <div className="relative">
             <label className="block mb-2 text-lg font-semibold">
               Generated Password:
