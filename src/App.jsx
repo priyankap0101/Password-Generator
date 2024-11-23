@@ -263,24 +263,34 @@ function App() {
                 setValue: setExcludeSimilar,
               },
             ].map((option, idx) => (
-              <div key={idx} className="flex items-center">
-                <label className="mr-2 text-lg font-semibold">
-                  {option.label}
-                </label>
-                <Switch
-                  checked={option.value}
-                  onChange={option.setValue}
-                  className={`relative inline-flex items-center h-6 rounded-full w-12 transition ${
-                    option.value ? switchBgColor : "bg-gray-300"
+              <button
+                key={idx}
+                onClick={() => option.setValue(!option.value)}
+                className={`flex items-center justify-between w-full p-4 rounded-lg shadow-md transition-all duration-300 
+        ${
+          option.value
+            ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
+            : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+        } focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600`}
+              >
+                {/* Label */}
+                <span className="text-base font-medium">{option.label}</span>
+
+                {/* Toggle Icon */}
+                <span
+                  className={`flex items-center justify-center w-8 h-8 rounded-full transform transition-all duration-300 ${
+                    option.value
+                      ? "bg-white text-blue-500 rotate-0"
+                      : "bg-gray-300 text-gray-500 rotate-180"
                   }`}
                 >
-                  <span
-                    className={`${
-                      option.value ? "translate-x-6" : "translate-x-1"
-                    } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
-                  />
-                </Switch>
-              </div>
+                  <i
+                    className={`fas ${
+                      option.value ? "fa-check" : "fa-times"
+                    } text-lg`}
+                  ></i>
+                </span>
+              </button>
             ))}
           </div>
 
