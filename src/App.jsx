@@ -174,8 +174,9 @@ function App() {
                 value={password}
                 ref={passwordRef}
                 readOnly
-                className={`w-full px-3 py-2 transition ${inputBgColor} ${borderColor} rounded-lg focus:ring-2 focus:ring-blue-500`}
+                className={`w-full px-4 py-2 border rounded-lg transition shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none ${inputBgColor} ${borderColor}`}
               />
+
               <button
                 onClick={copyPasswordToClipboard}
                 className={`absolute p-2 right-12 ${passwordInputTextColor} hover:text-white`}
@@ -286,17 +287,26 @@ function App() {
           {/* Password Strength */}
           <div className="mb-8">
             <span className="text-lg font-semibold">Password Strength: </span>
-            <span
-              className={`text-lg font-bold ${
-                calculateStrength(password) === "Strong"
-                  ? "text-green-500"
-                  : calculateStrength(password) === "Moderate"
-                  ? "text-yellow-500"
-                  : "text-red-500"
-              }`}
-            >
-              {calculateStrength(password)}
-            </span>
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+              <div
+                className={`h-2.5 rounded-full ${
+                  calculateStrength(password) === "Strong"
+                    ? "bg-green-500"
+                    : calculateStrength(password) === "Moderate"
+                    ? "bg-yellow-500"
+                    : "bg-red-500"
+                }`}
+                style={{
+                  width: `${
+                    calculateStrength(password) === "Strong"
+                      ? 100
+                      : calculateStrength(password) === "Moderate"
+                      ? 75
+                      : 50
+                  }%`,
+                }}
+              ></div>
+            </div>
           </div>
 
           {/* Password History */}
