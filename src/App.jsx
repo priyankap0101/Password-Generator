@@ -323,15 +323,15 @@ function App() {
           <div className="mb-6">
             <h2 className="mb-4 text-lg font-semibold">Password History:</h2>
             <ul className="space-y-2">
-              {passwordHistory.map((pass, idx) => (
+              {passwordHistory.slice(0, 5).map((pass, idx) => (
                 <li
                   key={idx}
-                  className={`flex items-center justify-between p-2 rounded-lg transition ${inputBgColor} ${textColor}`}
+                  className={`flex items-center justify-between p-2 rounded-lg shadow-sm transition ${inputBgColor} ${textColor}`}
                 >
                   <span className="truncate">{pass}</span>
                   <button
                     onClick={() => handleUsePassword(pass)}
-                    className={`px-2 py-1 text-sm rounded-lg transition ${buttonBgColor} ${textColor} hover:${buttonHoverColor}`}
+                    className={`px-3 py-1 text-sm rounded-lg font-medium ${buttonBgColor} hover:${buttonHoverColor}`}
                   >
                     Use
                   </button>
