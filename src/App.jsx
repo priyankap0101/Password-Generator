@@ -321,17 +321,19 @@ function App() {
 
           {/* Password History */}
           <div className="mb-6">
-            <h2 className="mb-4 text-lg font-semibold">Password History:</h2>
-            <ul className="space-y-2">
+            <h2 className="mb-4 text-xl font-semibold text-gray-900">
+              Password History
+            </h2>
+            <ul className="space-y-3">
               {passwordHistory.slice(0, 5).map((pass, idx) => (
                 <li
                   key={idx}
-                  className={`flex items-center justify-between p-2 rounded-lg shadow-sm transition ${inputBgColor} ${textColor}`}
+                  className={`flex items-center justify-between p-4 rounded-lg shadow-lg transition ${inputBgColor} ${textColor} hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 >
-                  <span className="truncate">{pass}</span>
+                  <span className="text-sm text-gray-600 truncate">{pass}</span>
                   <button
                     onClick={() => handleUsePassword(pass)}
-                    className={`px-3 py-1 text-sm rounded-lg font-medium ${buttonBgColor} hover:${buttonHoverColor}`}
+                    className={`px-4 py-2 text-sm font-medium text-white rounded-lg ${buttonBgColor} hover:${buttonHoverColor} focus:ring-2 focus:ring-blue-500`}
                   >
                     Use
                   </button>
