@@ -146,9 +146,16 @@ function App() {
         <section className={`p-8 shadow-lg rounded-xl ${bgColor} ${textColor}`}>
           {/* Form Header */}
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-sm">
-              Password Generator
+            <h1
+              className="text-4xl font-extrabold tracking-tight text-center text-transparent sm:text-5xl md:text-6xl drop-shadow-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-600 bg-clip-text animate-fade-in-long"
+              aria-label="Password Generator"
+            >
+              Password{" "}
+              <span className="underline transition-colors duration-300 decoration-wavy decoration-pink-500 hover:decoration-dotted">
+                Generator
+              </span>
             </h1>
+
             <Switch
               checked={darkMode}
               onChange={toggleDarkMode}
