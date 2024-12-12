@@ -150,10 +150,7 @@ function App() {
               className="text-4xl font-extrabold tracking-tight text-center text-transparent sm:text-5xl md:text-6xl drop-shadow-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-600 bg-clip-text animate-fade-in-long"
               aria-label="Password Generator"
             >
-              Password{" "}
-              <span className="underline transition-colors duration-300 decoration-wavy decoration-pink-500 hover:decoration-dotted">
-                Generator
-              </span>
+              Password Generator
             </h1>
 
             <Switch
