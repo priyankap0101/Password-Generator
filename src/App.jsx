@@ -300,26 +300,44 @@ function App() {
 
           {/* Password Strength */}
           <div className="mb-8">
-            <span className="text-lg font-semibold">Password Strength: </span>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-              <div
-                className={`h-2.5 rounded-full ${
-                  calculateStrength(password) === "Strong"
-                    ? "bg-green-500"
-                    : calculateStrength(password) === "Moderate"
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
-                }`}
-                style={{
-                  width: `${
+            <span className="text-lg font-semibold">Password Strength:</span>
+            <div className="flex items-center mt-2 space-x-2">
+              {/* Password Strength Bar */}
+              <div className="w-full h-3 bg-gray-200 rounded-full dark:bg-gray-700">
+                <div
+                  className={`h-3 rounded-full transition-all duration-300 ${
                     calculateStrength(password) === "Strong"
-                      ? 100
+                      ? "bg-green-500"
                       : calculateStrength(password) === "Moderate"
-                      ? 75
-                      : 50
-                  }%`,
-                }}
-              ></div>
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                  }`}
+                  style={{
+                    width: `${
+                      calculateStrength(password) === "Strong"
+                        ? 100
+                        : calculateStrength(password) === "Moderate"
+                        ? 75
+                        : 50
+                    }%`,
+                  }}
+                  aria-label={`Password strength is ${calculateStrength(
+                    password
+                  )}`}
+                ></div>
+              </div>
+              {/* Password Strength Label */}
+              <span
+                className={`text-sm font-medium ${
+                  calculateStrength(password) === "Strong"
+                    ? "text-green-500"
+                    : calculateStrength(password) === "Moderate"
+                    ? "text-yellow-500"
+                    : "text-red-500"
+                }`}
+              >
+                {calculateStrength(password)}
+              </span>
             </div>
           </div>
 
