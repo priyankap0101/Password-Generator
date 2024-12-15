@@ -147,7 +147,7 @@ function App() {
           {/* Form Header */}
           <div className="flex items-center justify-between mb-6">
             <h1
-              className="text-4xl font-extrabold tracking-tight text-center text-transparent sm:text-5xl md:text-6xl drop-shadow-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-600 bg-clip-text animate-fade-in-long"
+              className="font-semibold tracking-tight text-center text-transparent transition-all duration-300 ease-in-out transform sm:text-4xl bg-gradient-to-r from-indigo-600 via-pink-600 to-teal-600 bg-clip-text hover:bg-gradient-to-l hover:from-teal-600 hover:via-pink-600 hover:to-indigo-600 hover:scale-105 animate-fade-in"
               aria-label="Password Generator"
             >
               Password Generator
