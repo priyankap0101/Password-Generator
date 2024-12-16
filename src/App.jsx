@@ -244,7 +244,7 @@ function App() {
           </div>
 
           {/* Options */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-2 gap-4 mb-6">
             {[
               {
                 label: "Include Numbers",
@@ -270,19 +270,23 @@ function App() {
               <button
                 key={idx}
                 onClick={() => option.setValue(!option.value)}
-                className={`flex items-center justify-between w-full p-4 rounded-lg shadow-md transition-all duration-300 
+                className={`flex items-center justify-between w-full p-3 sm:p-4 rounded-lg shadow-lg transition-all duration-300 transform 
         ${
           option.value
-            ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
-            : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
-        } focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600`}
+            ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:scale-105 focus:scale-105 dark:bg-blue-700 dark:to-blue-800"
+            : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+        } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 dark:focus:ring-blue-600`}
+                aria-pressed={option.value}
+                aria-label={option.label}
               >
                 {/* Label */}
-                <span className="text-base font-medium">{option.label}</span>
+                <span className="text-sm font-semibold sm:text-base">
+                  {option.label}
+                </span>
 
                 {/* Toggle Icon */}
                 <span
-                  className={`flex items-center justify-center w-8 h-8 rounded-full transform transition-all duration-300 ${
+                  className={`flex items-center justify-center w-8 h-8 rounded-full transform transition-transform duration-300 ${
                     option.value
                       ? "bg-white text-blue-500 rotate-0"
                       : "bg-gray-300 text-gray-500 rotate-180"
@@ -291,7 +295,7 @@ function App() {
                   <i
                     className={`fas ${
                       option.value ? "fa-check" : "fa-times"
-                    } text-lg`}
+                    } text-base sm:text-lg`}
                   ></i>
                 </span>
               </button>
