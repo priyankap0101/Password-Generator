@@ -204,29 +204,60 @@ function App() {
           </div>
 
           {/* Custom Input */}
-          <div className="mb-8">
-            <label className="block mb-2 text-lg font-semibold">
-              Custom Text (optional):
-            </label>
-            <input
-              type="text"
-              value={customInput}
-              onChange={(e) => setCustomInput(e.target.value)}
-              placeholder="Add custom text"
-              className={`w-full px-3 py-2 mb-4 transition ${inputBgColor} ${borderColor} rounded-lg focus:ring-2 focus:ring-blue-500`}
-            />
-            <label className="block mt-4 text-lg font-semibold">
-              Position:
-            </label>
-            <select
-              value={customInputPosition}
-              onChange={(e) => setCustomInputPosition(e.target.value)}
-              className={`w-full px-3 py-2 mt-2 transition ${inputBgColor} ${borderColor} rounded-lg focus:ring-2 focus:ring-blue-500`}
-            >
-              <option value="start">Start</option>
-              <option value="end">End</option>
-              <option value="random">Random</option>
-            </select>
+          <div className="mb-8 space-y-6">
+            {/* Custom Text Input */}
+            <div className="flex flex-col">
+              <label
+                htmlFor="custom-text-input"
+                className="mb-2 text-lg font-medium "
+              >
+                Custom Text{" "}
+                <span className="text-sm font-normal">(optional)</span>:
+              </label>
+              <input
+                id="custom-text-input"
+                type="text"
+                value={customInput}
+                onChange={(e) => setCustomInput(e.target.value)}
+                placeholder="Add custom text here..."
+                className={`w-full px-4 py-2 border rounded-lg transition shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none ${inputBgColor} ${borderColor}`}
+              />
+            </div>
+
+            {/* Position Selector */}
+            <div className="flex flex-col">
+              <label
+                htmlFor="position-selector"
+                className="mb-2 text-lg font-medium"
+              >
+                Position:
+              </label>
+              <select
+                id="position-selector"
+                value={customInputPosition}
+                onChange={(e) => setCustomInputPosition(e.target.value)}
+                className={`w-full px-4 py-2 border rounded-lg transition shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none ${inputBgColor} ${borderColor}`}
+              >
+                <option
+                  value="start"
+                  className="text-gray-800 dark:text-gray-200"
+                >
+                  Start
+                </option>
+                <option
+                  value="end"
+                  className="text-gray-800 dark:text-gray-200"
+                >
+                  End
+                </option>
+                <option
+                  value="random"
+                  className="text-gray-800 dark:text-gray-200"
+                >
+                  Random
+                </option>
+              </select>
+            </div>
           </div>
 
           <div className="mb-8">
