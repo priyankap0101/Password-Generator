@@ -261,17 +261,35 @@ function App() {
           </div>
 
           <div className="mb-8">
-            <label className="block mb-2 text-lg font-semibold">
-              Password Length: {length}
-            </label>
+            {/* Label and Value */}
+            <div className="flex items-center justify-between mb-4">
+              <label
+                htmlFor="password-length"
+                className="text-lg font-semibold "
+              >
+                Password Length
+              </label>
+              <span className="px-2 py-1 text-sm font-medium text-blue-600 bg-blue-100 rounded-md dark:bg-blue-600 dark:text-white">
+                {length}
+              </span>
+            </div>
+
+            {/* Slider Input */}
             <input
+              id="password-length"
               type="range"
               min="4"
               max="32"
               value={length}
               onChange={(e) => setLength(parseInt(e.target.value))}
-              className="w-full"
+              className="w-full h-2 transition-opacity bg-gray-300 rounded-full appearance-none dark:bg-gray-700 accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:opacity-90"
             />
+
+            {/* Min and Max Labels */}
+            <div className="flex justify-between mt-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+              <span>4</span>
+              <span>32</span>
+            </div>
           </div>
 
           {/* Options */}
