@@ -209,7 +209,7 @@ function App() {
             <div className="flex flex-col">
               <label
                 htmlFor="custom-text-input"
-                className="mb-2 text-lg font-medium "
+                className="mb-2 text-lg font-medium text-gray-800 dark:text-gray-200"
               >
                 Custom Text{" "}
                 <span className="text-sm font-normal">(optional)</span>:
@@ -220,7 +220,11 @@ function App() {
                 value={customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
                 placeholder="Add custom text here..."
-                className={`w-full px-4 py-2 border rounded-lg transition shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none ${inputBgColor} ${borderColor}`}
+                className={`w-full px-4 py-2 border rounded-lg transition duration-300 ease-in-out shadow-sm 
+        bg-white text-gray-800 border-gray-300 placeholder-gray-400 
+        focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none 
+        dark:bg-[#1E293B] dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-600 
+        dark:focus:ring-blue-400 dark:focus:border-blue-400`}
               />
             </div>
 
@@ -228,7 +232,7 @@ function App() {
             <div className="flex flex-col">
               <label
                 htmlFor="position-selector"
-                className="mb-2 text-lg font-medium"
+                className="mb-2 text-lg font-medium text-gray-800 dark:text-gray-200"
               >
                 Position:
               </label>
@@ -236,26 +240,15 @@ function App() {
                 id="position-selector"
                 value={customInputPosition}
                 onChange={(e) => setCustomInputPosition(e.target.value)}
-                className={`w-full px-4 py-2 border rounded-lg transition shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none ${inputBgColor} ${borderColor}`}
+                className={`w-full px-4 py-2 border rounded-lg transition duration-300 ease-in-out shadow-sm 
+        bg-white text-gray-800 border-gray-300 
+        focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none 
+        dark:bg-[#1E293B] dark:text-gray-100 dark:border-gray-600 
+        dark:focus:ring-blue-400 dark:focus:border-blue-400`}
               >
-                <option
-                  value="start"
-                  className="text-gray-800 dark:text-gray-200"
-                >
-                  Start
-                </option>
-                <option
-                  value="end"
-                  className="text-gray-800 dark:text-gray-200"
-                >
-                  End
-                </option>
-                <option
-                  value="random"
-                  className="text-gray-800 dark:text-gray-200"
-                >
-                  Random
-                </option>
+                <option value="start">Start</option>
+                <option value="end">End</option>
+                <option value="random">Random</option>
               </select>
             </div>
           </div>
